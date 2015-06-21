@@ -25,11 +25,13 @@ class ConstraintMatrix(object):
             last_column_node = Node('_', covered_constraint)
             if not self._entry.right:
                 self._entry.right = last_column_node
+                last_column_node.left = self._entry
 
         if not last_row_node:
             last_row_node = Node(candidate, '_')
             if not self._entry.down:
                 self._entry.down = last_row_node
+                last_row_node.top = self.entry
 
         # add node to the column_map if not defined yet
         if not self._column_head_by_constraint.get(covered_constraint):
@@ -127,12 +129,12 @@ class Node(object):
         self._right = node
 
     @property
-    def up(self):
-        return self._up
+    def top(self):
+        return self._top
 
-    @up.setter
-    def up(self, node):
-        self._up = node
+    @top.setter
+    def top(self, node):
+        self._top = node
 
     @property
     def down(self):
@@ -150,34 +152,36 @@ class Node(object):
 
 
 class ColumnIterator(object):
-    def __init__(self, start):
+    def __init__(self, start, reversed=False):
         self._current = start
+        self._reversed = reversed
 
     def __iter__(self):
         return self
 
     def __next__(self):
-        # in case the linked list is circular
+        next_node = '_top' if self._reversed else '_down'
         if self._current:
             current, self._current = \
-                self._current, self._current.down
+                self._current, vars(self._current)[next_node]
             return current
         else:
             raise StopIteration
 
 
 class RowIterator(object):
-    def __init__(self, start):
+    def __init__(self, start, reversed=False):
         self._current = start
+        self._reversed = reversed
 
     def __iter__(self):
         return self
 
     def __next__(self):
-        # in case the linked list is circular
+        next_node = '_left' if self._reversed else '_right'
         if self._current:
             current, self._current = \
-                self._current, self._current.right
+                self._current, vars(self._current)[next_node]
             return current
         else:
             raise StopIteration

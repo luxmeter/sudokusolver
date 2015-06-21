@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 # encoding: utf-8
 import unittest
-import logging
 from sudoku_matrix import ConstraintMatrix
 from sudoku_matrix import ColumnIterator
 from sudoku_matrix import RowIterator
 
-logging.basicConfig(level=logging.DEBUG)
+# logging.basicConfig(level=logging.DEBUG)
 
 class ConstraintMatrixTest(unittest.TestCase):
     def setUp(self):
@@ -56,6 +55,20 @@ class ConstraintMatrixTest(unittest.TestCase):
         self.assertCountEqual([('_', 'c2'), ('r1', 'c2'), ('r2', 'c2')],
                       nodes)
 
+        # try to iterate backwards on column headers
+        # iterate through column headers
+        nodes = [(node.candidate, node._covered_constraint)
+                 for node in RowIterator(self.m.entry.right.right, reversed=True)]
+        self.assertEqual(3, len(nodes))
+        self.assertCountEqual([('_', '_'), ('_', 'c1'), ('_', 'c2')], nodes)
+
+
+        # iterate through c2 column
+        nodes = [(node.candidate, node._covered_constraint)
+                 for node in ColumnIterator(self.m.entry.right.right.down.down, reversed=True)]
+        self.assertEqual(3, len(nodes))
+        self.assertCountEqual([('_', 'c2'), ('r1', 'c2'), ('r2', 'c2')],
+                      nodes)
 
 
 if __name__ == '__main__':
