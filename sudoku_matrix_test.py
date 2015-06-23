@@ -1,11 +1,16 @@
 #!/usr/bin/env python
 # encoding: utf-8
 import unittest
+from rules import get_all_candidates, get_all_satisfied_constraints, \
+    _get_satisfying_values
 from sudoku_matrix import ConstraintMatrix
 from sudoku_matrix import ColumnIterator
 from sudoku_matrix import RowIterator
 
 # logging.basicConfig(level=logging.DEBUG)
+MAX_CANDIDATES = 729
+MAX_CONSTRAINTS = 324
+
 
 class ConstraintMatrixTest(unittest.TestCase):
     def setUp(self):
@@ -27,8 +32,39 @@ class ConstraintMatrixTest(unittest.TestCase):
                               nodes)
 
     def test_linked_list_integrity(self):
-        self.__setup_matrix()
+        self.m.add('r1', ['c1', 'c2'])
+        self.m.add('r2', ['c2'])
         self.__check_integrity()
+
+    def test_cover_and_uncover(self):
+        matrix = self.__create_matrix()
+        candidate = matrix._row_head_by_candidate['R1C1#1']
+        matrix.cover(candidate)
+        covered_constraints = get_all_satisfied_constraints('R1C1#1')
+        count_covered_constraints = len(covered_constraints)
+        count_covered_candidates = 29
+
+        count_candidates, count_constraints = self.__calc_size(matrix)
+        self.assertEqual(MAX_CONSTRAINTS-count_covered_constraints,
+                         count_constraints)
+        self.assertEqual(MAX_CANDIDATES-count_covered_candidates,
+                         count_candidates)
+
+        matrix.uncover(candidate)
+        count_candidates, count_constraints = self.__calc_size(matrix)
+        self.__check_size(count_candidates, count_constraints)
+
+    def test_matrix_full_size(self):
+        matrix = self.__create_matrix()
+        count_candidates, count_constraints = self.__calc_size(matrix)
+        self.__check_size(count_candidates, count_constraints)
+
+    def __create_matrix(self):
+        matrix = ConstraintMatrix()
+        for candidate in get_all_candidates():
+            satisfied_constraints = get_all_satisfied_constraints(candidate)
+            matrix.add(candidate, satisfied_constraints)
+        return matrix
 
     def __check_integrity(self):
         # row checks
@@ -65,36 +101,17 @@ class ConstraintMatrixTest(unittest.TestCase):
         self.assertCountEqual([('_', 'c2'), ('r1', 'c2'), ('r2', 'c2')],
                               nodes)
 
-    def test_constraint_covering(self):
-        self.__setup_matrix()
+    def __check_size(self, count_candidates, count_constraints):
+        self.assertEqual(MAX_CONSTRAINTS, count_constraints)
+        self.assertEqual(MAX_CANDIDATES, count_candidates)
 
-        column_head = self.m.get_unsatisfied_constraint_column()
-        self.assertIsNotNone(column_head)
-        self.assertFalse(self.m.has_satisfied_all_constraints())
+    def __calc_size(self, matrix):
+        count_constraints = sum([1 for n in RowIterator(matrix.entry)
+                                 if n is not matrix.entry])
+        count_candidates = sum([1 for n in ColumnIterator(matrix.entry)
+                                if n is not matrix.entry])
+        return count_candidates, count_constraints
 
-        self.m.cover(column_head.down.row_head)
-        self.assertIsNone(self.m.get_unsatisfied_constraint_column())
-        self.assertTrue(self.m.has_satisfied_all_constraints())
-
-
-    def test_constraint_covering(self):
-        self.__setup_matrix()
-
-        row_head = self.m.get_unsatisfied_constraint_column().down.row_head
-        self.m.cover(row_head)
-        self.assertIsNone(self.m.get_unsatisfied_constraint_column())
-        self.assertTrue(self.m.has_satisfied_all_constraints())
-        self.assertIsNone(self.m.entry.down)
-
-        self.m.uncover(row_head)
-        self.assertIsNotNone(self.m.get_unsatisfied_constraint_column())
-        self.assertFalse(self.m.has_satisfied_all_constraints())
-        self.assertIsNotNone(self.m.entry.down)
-        self.__check_integrity()
-
-    def __setup_matrix(self):
-        self.m.add('r1', ['c1', 'c2'])
-        self.m.add('r2', ['c2'])
 
 
 if __name__ == '__main__':

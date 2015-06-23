@@ -36,6 +36,8 @@ class ConstraintMatrix(object):
 
         # provides all candidates that satisfy the same constraints
         row_heads = self.__get_covered_rows(column_heads)
+        # log.info('covering candidates \t%s', row_heads)
+        # log.info('covering constraints %s', column_heads)
 
         # remove rows
         removed_row_nodes = []
