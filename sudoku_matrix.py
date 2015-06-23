@@ -36,8 +36,8 @@ class ConstraintMatrix(object):
 
         # provides all candidates that satisfy the same constraints
         row_heads = self.__get_covered_rows(column_heads)
-        # log.info('covering candidates \t%s', row_heads)
-        # log.info('covering constraints %s', column_heads)
+        log.info('covering candidates \t%s', row_heads)
+        log.info('covering constraints %s', column_heads)
 
         # remove rows
         removed_row_nodes = []
@@ -232,16 +232,19 @@ class Node(object):
         self._down = node
 
     def __repr__(self):
-        return "Node('{}', '{}')".format(self._candidate, self._covered_constraint)
+        return "Node('{}', '{}')".format(self._candidate,
+                                         self._covered_constraint)
 
     def __str__(self):
-        return repr(self)
-    
+        return "Node('{}', '{}')".format(self._candidate,
+                                         self._covered_constraint)
+
     def __hash__(self):
         return hash((self._candidate, self._covered_constraint))
 
     def __eq__(self, other):
-        return (self._candidate, self._covered_constraint) == (other._candidate, other._covered_constraint)
+        return (self._candidate, self._covered_constraint) ==\
+               (other._candidate, other._covered_constraint)
 
 
 class ColumnIterator(object):

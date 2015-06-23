@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 import unittest
-from rules import get_all_candidates, get_all_satisfied_constraints, \
-    _get_satisfying_values
+from rules import get_all_candidates, get_all_satisfied_constraints
 from sudoku_matrix import ConstraintMatrix
 from sudoku_matrix import ColumnIterator
 from sudoku_matrix import RowIterator

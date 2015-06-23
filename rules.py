@@ -3,6 +3,9 @@ from collections import defaultdict
 
 
 # there is only one number in one cell
+import itertools
+
+
 def _get_row_column_constraints():
     for row in range(1, 10):
         for column in range(1, 10):
@@ -59,10 +62,12 @@ def _get_satisfying_values(predicate, constraint=None):
 
 
 def get_all_candidates():
+    result = []
     for row in range(1, 10):
         for column in range(1, 10):
             for number in range(1, 10):
-                yield 'R{}C{}#{}'.format(row, column, number)
+                result.append('R{}C{}#{}'.format(row, column, number))
+    return result
 
 
 def get_all_satisfied_constraints(*candidates):
