@@ -3,7 +3,7 @@ import sys
 import importer
 import logging
 import random
-from sudoku_matrix import ConstraintMatrix
+from sudoku_matrix import ConstraintMatrix, RowIterator
 from rules import get_all_satisfied_constraints
 from rules import get_all_candidates
 
@@ -18,32 +18,35 @@ def main(argv):
         exit('File does not exists')
 
     matrix = create_matrix(importer.imp_candidates(file_path))
-    solution = solve(matrix, create_row_generator(
-        matrix.get_unsatisfied_constraint_column()))
+    solution = []
+    solve(matrix, get_next_constraint(matrix, []), solution)
     if matrix.has_satisfied_all_constraints():
         log.info('Found solution: %s', solution)
     else:
         log.info('There is no solution')
 
-def solve(matrix, constraint_generator, result_set=()):
-    if matrix.has_satisfied_all_constraints():
-        return result_set
-    constraint = next(constraint_generator, None)
-    if constraint and constraint.down:
-        log.info('resolving constraint \t%s', constraint.covered_constraint)
+
+def solve(matrix, constraint, result_set, covered_constraints = []):
+    if not matrix.has_satisfied_all_constraints() and matrix.entry.down:
+        log.info('constraint: \t%s', constraint)
         candidates = [candidate.row_head for candidate in
                       create_column_generator(constraint)]
-        # random.shuffle(candidates, random.random)
         for candidate in candidates:
-            log.info('checking candidate \t%s', candidate.candidate)
-            new_result_set = result_set + (candidate,)
-            matrix.cover(candidate)
-            new_result_set = solve(matrix, create_row_generator(constraint.right), new_result_set)
+            covered_constraints = covered_constraints + matrix.cover(candidate)
+            result_set.append(candidate.candidate)
+            solve(matrix, get_next_constraint(matrix, covered_constraints), result_set, covered_constraints)
             if matrix.has_satisfied_all_constraints():
-                return new_result_set
-            matrix.uncover(candidate)
-    log.info('solution not found')
+                break
+            covered_constraints = [c for c in matrix.uncover(candidate)]
+            result_set.remove(candidate.candidate)
+
+
+def get_next_constraint(matrix, covered_constraints):
+    for c in RowIterator(matrix.entry.right):
+        if c not in covered_constraints:
+            return c
     return None
+
 
 def create_column_generator(column_head):
     node = column_head

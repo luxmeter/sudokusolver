@@ -24,10 +24,3 @@ def imp_candidates(path):
                 candidate = 'R{}C{}#{}'.format(rownumber, columnnumber, value)
                 fix_candidates.append(candidate)
     return fix_candidates
-
-
-if __name__ == '__main__':
-    print('importing example.csv')
-    fix_candidates = imp_candidates('example.csv')
-    print('---')
-    print(fix_candidates)

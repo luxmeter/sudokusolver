@@ -36,8 +36,9 @@ class ConstraintMatrix(object):
 
         # provides all candidates that satisfy the same constraints
         row_heads = self.__get_covered_rows(column_heads)
-        log.info('covering candidates \t%s', row_heads)
-        log.info('covering constraints %s', column_heads)
+        # log.info('+candidate \t%s', row_head)
+        # log.info('covering candidates \t%s', row_heads)
+        # log.info('covering constraints %s', column_heads)
 
         # remove rows
         removed_row_nodes = []
@@ -60,10 +61,15 @@ class ConstraintMatrix(object):
                 removed_column_nodes.append(node)
 
         self._history[row_head] = (removed_row_nodes, removed_column_nodes)
+        return column_heads
 
     def uncover(self, row_head):
+        if(row_head not in self._history):
+            return
         removed_row_nodes, removed_column_nodes = self._history[row_head]
-
+        # log.info('-candidate \t%s', row_head)
+        # log.info('uncovering candidates \t%s', removed_row_nodes)
+        # log.info('uncovering constraints %s', removed_column_nodes)
         if removed_column_nodes:
             for node in removed_column_nodes:
                 if node.left:
@@ -79,16 +85,19 @@ class ConstraintMatrix(object):
                     node.down.top = node
 
         self._history.pop(row_head)
+        return self.__get_covered_columns(row_head)
 
     def __get_covered_rows(self, column_heads):
-        return set(node.row_head
-                   for column_head in column_heads
-                   for node in ColumnIterator(column_head)
-                   if node.row_head)
+        seen = []
+        for column_head in column_heads:
+            for node in ColumnIterator(column_head):
+                if node not in seen:
+                    seen.append(node)
+        return seen
 
     def __get_covered_columns(self, row):
-        return set(node.column_head for node in RowIterator(row)
-                   if node.column_head)
+        return [node.column_head for node in RowIterator(row)
+                   if node.column_head]
 
     def __append(self, candidate, covered_constraint):
         last_column_node = self.__get_last_column_node(covered_constraint)
