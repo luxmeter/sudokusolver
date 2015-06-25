@@ -61,11 +61,9 @@ class ConstraintMatrix(object):
                 removed_column_nodes.append(node)
 
         self._history[row_head] = (removed_row_nodes, removed_column_nodes)
-        return column_heads
+        return row_heads, column_heads
 
     def uncover(self, row_head):
-        if(row_head not in self._history):
-            return
         removed_row_nodes, removed_column_nodes = self._history[row_head]
         # log.info('-candidate \t%s', row_head)
         # log.info('uncovering candidates \t%s', removed_row_nodes)
@@ -85,14 +83,15 @@ class ConstraintMatrix(object):
                     node.down.top = node
 
         self._history.pop(row_head)
-        return self.__get_covered_columns(row_head)
+        return removed_row_nodes, removed_column_nodes
 
     def __get_covered_rows(self, column_heads):
         seen = []
         for column_head in column_heads:
             for node in ColumnIterator(column_head):
-                if node not in seen:
-                    seen.append(node)
+                if node.row_head and \
+                                node.row_head not in seen:
+                    seen.append(node.row_head)
         return seen
 
     def __get_covered_columns(self, row):

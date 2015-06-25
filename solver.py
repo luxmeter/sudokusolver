@@ -3,7 +3,7 @@ import sys
 import importer
 import logging
 import random
-from sudoku_matrix import ConstraintMatrix, RowIterator
+from sudoku_matrix import ConstraintMatrix, RowIterator, ColumnIterator
 from rules import get_all_satisfied_constraints
 from rules import get_all_candidates
 
@@ -26,25 +26,37 @@ def main(argv):
         log.info('There is no solution')
 
 
-def solve(matrix, constraint, result_set, covered_constraints = []):
+def solve(matrix, constraint, result_set,
+          covered_candidates = [], covered_constraints = []):
     if not matrix.has_satisfied_all_constraints() and matrix.entry.down:
         log.info('constraint: \t%s', constraint)
-        candidates = [candidate.row_head for candidate in
-                      create_column_generator(constraint)]
-        for candidate in candidates:
-            covered_constraints = covered_constraints + matrix.cover(candidate)
+        candidate = get_next_candidate(constraint, covered_candidates)
+        while candidate:
+            log.info('candidate: \t%s', candidate)
+            removed_candidates, removed_constraints = matrix.cover(candidate)
+            covered_candidates = covered_candidates + removed_candidates
+            covered_constraints = covered_constraints + removed_constraints
             result_set.append(candidate.candidate)
-            solve(matrix, get_next_constraint(matrix, covered_constraints), result_set, covered_constraints)
+            next_constraint = get_next_constraint(matrix, covered_constraints)
+            solve(matrix, next_constraint,
+                  result_set, covered_candidates, covered_constraints)
             if matrix.has_satisfied_all_constraints():
                 break
-            covered_constraints = [c for c in matrix.uncover(candidate)]
             result_set.remove(candidate.candidate)
-
+            covered_candidates = [c for c in covered_candidates if c not in removed_candidates]
+            covered_constraints = [c for c in covered_constraints if c not in removed_constraints]
+            candidate = candidate.down
 
 def get_next_constraint(matrix, covered_constraints):
     for c in RowIterator(matrix.entry.right):
         if c not in covered_constraints:
             return c
+    return None
+
+def get_next_candidate(constraint, covered_candidates):
+    for c in ColumnIterator(constraint):
+        if c.row_head and c not in covered_candidates:
+            return c.row_head
     return None
 
 
