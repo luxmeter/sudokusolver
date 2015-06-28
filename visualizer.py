@@ -1,23 +1,26 @@
 from collections import defaultdict
 import re
-
 import rules
 
 
 def visualize(candidates):
     candidates = [_map_to_coordinate(c) for c in candidates]
-    candidates = sorted(candidates)
-    row_map = _get_row_map(candidates)
-    for row, fields in row_map.items():
-        sum_fields = []
-        max_range = len(fields) if len(fields) >= 9 else 9
-        for c in range(0, max_range):
-            f = fields[c] if c < len(fields) else None
-            if f:
-                sum_fields.append('%s' % f[1])
-            else:
-                sum_fields.append('%s' % (c, '_'))
-        print('R#%s: %s' % (row, sum_fields))
+    candidate_map = defaultdict(dict)
+    for r in range(0, 9):
+        for c in range(0, 9):
+            candidate_map[r][c] = 0
+
+    for row, column, number in candidates:
+       candidate_map[(row-1)][(column-1)] = number
+
+    for row in candidate_map.keys():
+        if row != 0 and row % 3 == 0:
+            print('')
+        numbers = [str(n) for n in candidate_map[row].values()]
+        for i, number in enumerate(numbers):
+            if i != 0 and i % 3 == 0:
+                numbers[i] = ' |' + number
+        print('|' + '|'.join(numbers) + '|')
 
 
 def _get_row_map(candidates):
