@@ -1,9 +1,5 @@
 #!/usr/bin/env python
 # encoding: utf-8
-import logging as logging
-
-log = logging.getLogger(__name__)
-
 
 class ConstraintMatrix(object):
     """Matrix to solve an exact cover problem.
@@ -36,9 +32,6 @@ class ConstraintMatrix(object):
 
         # provides all candidates that satisfy the same constraints
         row_heads = self.__get_covered_rows(column_heads)
-        # log.info('+candidate \t%s', row_head)
-        # log.info('covering candidates \t%s', row_heads)
-        # log.info('covering constraints %s', column_heads)
 
         # remove rows
         removed_row_nodes = []
@@ -65,9 +58,6 @@ class ConstraintMatrix(object):
 
     def uncover(self, row_head):
         removed_row_nodes, removed_column_nodes = self._history[row_head]
-        # log.info('-candidate \t%s', row_head)
-        # log.info('uncovering candidates \t%s', removed_row_nodes)
-        # log.info('uncovering constraints %s', removed_column_nodes)
         if removed_column_nodes:
             for node in removed_column_nodes:
                 if node.left:
@@ -136,14 +126,10 @@ class ConstraintMatrix(object):
         self.__append_row_nodes(last_row_node, node)
 
     def __append_row_nodes(self, last_row_node, node):
-        log.debug('setting %s as next row node from %s',
-                  node, last_row_node)
         last_row_node.right = node
         node.left = last_row_node
 
     def __append_column_nodes(self, last_column_node, node):
-        log.debug('setting %s as next column node from %s',
-                  node, last_column_node)
         last_column_node.down = node
         node.top = last_column_node
 

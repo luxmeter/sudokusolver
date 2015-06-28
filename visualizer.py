@@ -1,5 +1,6 @@
 from collections import defaultdict
 import re
+
 import rules
 
 
@@ -11,7 +12,7 @@ def visualize(candidates):
             candidate_map[r][c] = 0
 
     for row, column, number in candidates:
-       candidate_map[(row-1)][(column-1)] = number
+        candidate_map[(row - 1)][(column - 1)] = number
 
     for row in candidate_map.keys():
         if row != 0 and row % 3 == 0:
