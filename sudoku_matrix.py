@@ -6,10 +6,11 @@ class ConstraintMatrix(object):
     Each node knows his top, left, right and bottom neighbour"""
 
     def __init__(self):
-        self._history = {}
+        self._history = []
         self._entry = Node('_', '_')
         self._column_head_by_constraint = {}
         self._row_head_by_candidate = {}
+        self._covered_constraints = []
 
     def add(self, candidate=None, covered_constraints=[]):
         for constraint in covered_constraints:
@@ -20,6 +21,15 @@ class ConstraintMatrix(object):
 
     def has_satisfied_all_constraints(self):
         return self._entry.right is None
+
+    def exists_candidates(self):
+        return self._entry.down is not None
+
+    def get_next_candidate(self):
+        constraint = self.__get_next_constraint()
+        if constraint:
+            for node in ColumnIterator(constraint.down):
+                yield node.row_head
 
     def cover(self, row_head):
         # For each column j such that Ar, j = 1,
@@ -33,17 +43,25 @@ class ConstraintMatrix(object):
         # provides all candidates that satisfy the same constraints
         row_heads = self.__get_covered_rows(column_heads)
 
-        # remove rows
-        removed_row_nodes = []
-        for head in row_heads:
-            for node in RowIterator(head):
-                if node.top:
-                    node.top.down = node.down
-                if node.down:
-                    node.down.top = node.top
-                removed_row_nodes.append(node)
+        removed_row_nodes = self.__cover_rows(row_heads)# remove columns
+        removed_column_nodes = self.__cover_columns(column_heads)
 
-        # remove columns
+        self._history.append((removed_row_nodes, removed_column_nodes))
+        self._covered_constraints = self._covered_constraints + column_heads
+        return row_heads, column_heads
+
+    def uncover(self):
+        removed_row_nodes, removed_column_nodes = self._history.pop()
+        self.__uncover_columns(removed_column_nodes)
+        self.__uncover_rows(removed_row_nodes)
+
+        self._covered_constraints = \
+            [c for c in self._covered_constraints
+             if c not in removed_column_nodes]
+
+        return removed_row_nodes, removed_column_nodes
+
+    def __cover_columns(self, column_heads):
         removed_column_nodes = []
         for head in column_heads:
             for node in ColumnIterator(head):
@@ -52,19 +70,20 @@ class ConstraintMatrix(object):
                 if node.right:
                     node.right.left = node.left
                 removed_column_nodes.append(node)
+        return removed_column_nodes
 
-        self._history[row_head] = (removed_row_nodes, removed_column_nodes)
-        return row_heads, column_heads
+    def __cover_rows(self, row_heads):
+        removed_row_nodes = []
+        for head in row_heads:
+            for node in RowIterator(head):
+                if node.top:
+                    node.top.down = node.down
+                if node.down:
+                    node.down.top = node.top
+                removed_row_nodes.append(node)
+        return removed_row_nodes
 
-    def uncover(self, row_head):
-        removed_row_nodes, removed_column_nodes = self._history[row_head]
-        if removed_column_nodes:
-            for node in removed_column_nodes:
-                if node.left:
-                    node.left.right = node
-                if node.right:
-                    node.right.left = node
-
+    def __uncover_rows(self, removed_row_nodes):
         if removed_row_nodes:
             for node in removed_row_nodes:
                 if node.top:
@@ -72,8 +91,19 @@ class ConstraintMatrix(object):
                 if node.down:
                     node.down.top = node
 
-        self._history.pop(row_head)
-        return removed_row_nodes, removed_column_nodes
+    def __uncover_columns(self, removed_column_nodes):
+        if removed_column_nodes:
+            for node in removed_column_nodes:
+                if node.left:
+                    node.left.right = node
+                if node.right:
+                    node.right.left = node
+
+    def __get_next_constraint(self):
+        for c in RowIterator(self._entry.right):
+            if c not in self._covered_constraints:
+                return c
+        return None
 
     def __get_covered_rows(self, column_heads):
         seen = []
@@ -102,7 +132,7 @@ class ConstraintMatrix(object):
             last_row_node = Node(candidate, '_')
             if not self._entry.down:
                 self._entry.down = last_row_node
-                last_row_node.top = self.entry
+                last_row_node.top = self._entry
 
         # add node to the column_map if not defined yet
         if not self._column_head_by_constraint.get(covered_constraint):
@@ -152,10 +182,6 @@ class ConstraintMatrix(object):
             return current
 
         return None
-
-    @property
-    def entry(self):
-        return self._entry
 
 
 class Node(object):

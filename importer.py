@@ -23,4 +23,4 @@ def imp_candidates(path):
             if not value == '_':
                 candidate = 'R{}C{}#{}'.format(rownumber, columnnumber, value)
                 fix_candidates.append(candidate)
-    return fix_candidates
+    return tuple(fix_candidates)
