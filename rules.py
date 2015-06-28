@@ -3,7 +3,6 @@ from collections import defaultdict
 
 
 # there is only one number in one cell
-import itertools
 
 
 def _get_row_column_constraints():
@@ -82,4 +81,5 @@ def get_all_satisfied_constraints(*candidates):
 
 def get_all_constraints():
     return chain(_get_row_column_constraints(), _get_row_number_constraints(),
-        _get_column_number_constraints(), _get_block_number_constraints())
+                 _get_column_number_constraints(),
+                 _get_block_number_constraints())

@@ -1,8 +1,8 @@
 import os
 import sys
-import importer
 import logging
-import random
+
+import importer
 from sudoku_matrix import ConstraintMatrix, RowIterator, ColumnIterator
 from rules import get_all_satisfied_constraints
 from rules import get_all_candidates
@@ -11,6 +11,7 @@ import visualizer
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
 
+
 def main(argv):
     if len(argv) is not 2:
         exit('Aborted. Wrong amount of arguments.')
@@ -18,12 +19,13 @@ def main(argv):
     if not os.path.exists(file_path):
         exit('File does not exists')
 
-    matrix = create_matrix(importer.imp_candidates(file_path))
+    fixed_candidates = importer.imp_candidates(file_path)
+    matrix = create_matrix(fixed_candidates)
     solution = []
     solve(matrix, get_next_constraint(matrix, []), solution)
     if matrix.has_satisfied_all_constraints():
         log.info('Found solution: %s', solution)
-        visualizer.visualize(solution)
+        visualizer.visualize(fixed_candidates + solution)
     else:
         log.info('There is no solution')
 
@@ -36,7 +38,7 @@ def get_next_candidate(matrix, constraint, removed_candidates):
 
 
 def solve(matrix, constraint, result_set,
-          covered_candidates = [], covered_constraints = []):
+          covered_candidates=[], covered_constraints=[]):
     if not matrix.has_satisfied_all_constraints() and matrix.entry.down:
         log.info('constraint: \t%s', constraint)
         candidate = get_next_candidate(matrix, constraint, covered_candidates)
@@ -57,14 +59,18 @@ def solve(matrix, constraint, result_set,
             log.info('uncover c: \t%s\n', candidate)
             matrix.uncover(candidate)
             result_set.remove(candidate.candidate)
-            covered_candidates = [c for c in covered_candidates if c not in removed_candidates]
-            covered_constraints = [c for c in covered_constraints if c not in removed_constraints]
+            covered_candidates = [c for c in covered_candidates if
+                                  c not in removed_candidates]
+            covered_constraints = [c for c in covered_constraints if
+                                   c not in removed_constraints]
+
 
 def get_next_constraint(matrix, covered_constraints):
     for c in RowIterator(matrix.entry.right):
         if c not in covered_constraints:
             return c
     return None
+
 
 def create_column_generator(column_head):
     node = column_head
@@ -73,6 +79,7 @@ def create_column_generator(column_head):
         if node:
             yield node
 
+
 def create_row_generator(row_head):
     node = row_head
     while node:
@@ -80,13 +87,14 @@ def create_row_generator(row_head):
         if node:
             yield node
 
+
 def create_matrix(fixed_candidates):
     matrix = ConstraintMatrix()
     fixed_constraints = get_all_satisfied_constraints(*fixed_candidates)
     for candidate in get_all_candidates():
         satisfied_constraints = get_all_satisfied_constraints(candidate)
-        if candidate not in fixed_candidates\
-                and not(set(fixed_constraints) & set(satisfied_constraints)):
+        if candidate not in fixed_candidates \
+                and not (set(fixed_constraints) & set(satisfied_constraints)):
             matrix.add(candidate, satisfied_constraints)
     return matrix
 

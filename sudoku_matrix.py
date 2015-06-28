@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # encoding: utf-8
-from collections import namedtuple
 import logging as logging
 
 log = logging.getLogger(__name__)
@@ -9,6 +8,7 @@ log = logging.getLogger(__name__)
 class ConstraintMatrix(object):
     """Matrix to solve an exact cover problem.
     Each node knows his top, left, right and bottom neighbour"""
+
     def __init__(self):
         self._history = {}
         self._entry = Node('_', '_')
@@ -96,7 +96,7 @@ class ConstraintMatrix(object):
 
     def __get_covered_columns(self, row):
         return [node.column_head for node in RowIterator(row)
-                   if node.column_head]
+                if node.column_head]
 
     def __append(self, candidate, covered_constraint):
         last_column_node = self.__get_last_column_node(covered_constraint)
@@ -115,14 +115,15 @@ class ConstraintMatrix(object):
                 last_row_node.top = self.entry
 
         # add node to the column_map if not defined yet
-        if not  self._column_head_by_constraint.get(covered_constraint):
-            self._column_head_by_constraint[covered_constraint] = last_column_node
+        if not self._column_head_by_constraint.get(covered_constraint):
+            self._column_head_by_constraint[
+                covered_constraint] = last_column_node
             last = self.__get_last_row_node(None, head=self._entry)
             if last is not last_column_node:
                 self.__append_row_nodes(last, last_column_node)
 
         # add node to the row_map if not defined yet
-        if not  self._row_head_by_candidate.get(candidate):
+        if not self._row_head_by_candidate.get(candidate):
             self._row_head_by_candidate[candidate] = last_row_node
             last = self.__get_last_column_node(None, head=self._entry)
             if last is not last_row_node:
@@ -147,7 +148,7 @@ class ConstraintMatrix(object):
         node.top = last_column_node
 
     def __get_last_row_node(self, candidate, head=None):
-        current = self._row_head_by_candidate.get(candidate)\
+        current = self._row_head_by_candidate.get(candidate) \
             if not head else head
         if current:
             while current.right:
@@ -157,7 +158,7 @@ class ConstraintMatrix(object):
         return None
 
     def __get_last_column_node(self, covered_constraint, head=None):
-        current = self._column_head_by_constraint.get(covered_constraint)\
+        current = self._column_head_by_constraint.get(covered_constraint) \
             if not head else head
         if current:
             while current.down:
@@ -251,7 +252,7 @@ class Node(object):
         return hash((self._candidate, self._covered_constraint))
 
     def __eq__(self, other):
-        return (self._candidate, self._covered_constraint) ==\
+        return (self._candidate, self._covered_constraint) == \
                (other._candidate, other._covered_constraint)
 
 

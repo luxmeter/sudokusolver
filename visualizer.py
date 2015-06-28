@@ -1,5 +1,6 @@
 from collections import defaultdict
 import re
+
 import rules
 
 
@@ -13,10 +14,10 @@ def visualize(candidates):
         for c in range(0, max_range):
             f = fields[c] if c < len(fields) else None
             if f:
-                sum_fields.append('C%s#%s' % (f[0], f[1]))
+                sum_fields.append('%s' % f[1])
             else:
-                sum_fields.append('C%s#%s' % (c, '?'))
-        print('row %s: %s' % (row, sum_fields))
+                sum_fields.append('%s' % (c, '_'))
+        print('R#%s: %s' % (row, sum_fields))
 
 
 def _get_row_map(candidates):
