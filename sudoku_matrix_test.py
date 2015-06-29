@@ -51,7 +51,7 @@ class ConstraintMatrixTest(unittest.TestCase):
         self.assertEqual(MAX_CANDIDATES - count_covered_candidates,
                          count_candidates)
 
-        matrix.uncover(candidate)
+        matrix.uncover()
         count_candidates, count_constraints = self.__calc_size(matrix)
         self.__check_size(count_candidates, count_constraints)
 

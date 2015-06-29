@@ -61,6 +61,10 @@ class ConstraintMatrix(object):
 
         return removed_row_nodes, removed_column_nodes
 
+    @property
+    def entry(self):
+        return self._entry
+
     def __cover_columns(self, column_heads):
         removed_column_nodes = []
         for head in column_heads:
