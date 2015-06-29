@@ -46,18 +46,18 @@ class ConstraintMatrix(object):
         removed_row_nodes = self.__cover_rows(row_heads)# remove columns
         removed_column_nodes = self.__cover_columns(column_heads)
 
-        self._history.append((removed_row_nodes, removed_column_nodes))
+        self._history.append((row_head, column_heads, removed_row_nodes, removed_column_nodes))
         self._covered_constraints = self._covered_constraints + column_heads
         return row_heads, column_heads
 
     def uncover(self):
-        removed_row_nodes, removed_column_nodes = self._history.pop()
+        row_head, column_heads, removed_row_nodes, removed_column_nodes = self._history.pop()
         self.__uncover_columns(removed_column_nodes)
         self.__uncover_rows(removed_row_nodes)
 
         self._covered_constraints = \
             [c for c in self._covered_constraints
-             if c not in removed_column_nodes]
+             if c not in column_heads]
 
         return removed_row_nodes, removed_column_nodes
 
@@ -85,6 +85,8 @@ class ConstraintMatrix(object):
                 if node.down:
                     node.down.top = node.top
                 removed_row_nodes.append(node)
+                if node.column_head:
+                    node.column_head.size -= 1
         return removed_row_nodes
 
     def __uncover_rows(self, removed_row_nodes):
@@ -94,6 +96,8 @@ class ConstraintMatrix(object):
                     node.top.down = node
                 if node.down:
                     node.down.top = node
+                if node.column_head:
+                    node.column_head.size += 1
 
     def __uncover_columns(self, removed_column_nodes):
         if removed_column_nodes:
@@ -127,7 +131,7 @@ class ConstraintMatrix(object):
         last_row_node = self.__get_last_row_node(candidate)
 
         if not last_column_node:
-            last_column_node = Node('_', covered_constraint)
+            last_column_node = ColumnHeader('_', covered_constraint)
             if not self._entry.right:
                 self._entry.right = last_column_node
                 last_column_node.left = self._entry
@@ -140,8 +144,7 @@ class ConstraintMatrix(object):
 
         # add node to the column_map if not defined yet
         if not self._column_head_by_constraint.get(covered_constraint):
-            self._column_head_by_constraint[
-                covered_constraint] = last_column_node
+            self._column_head_by_constraint[covered_constraint] = last_column_node
             last = self.__get_last_row_node(None, head=self._entry)
             if last is not last_column_node:
                 self.__append_row_nodes(last, last_column_node)
@@ -158,6 +161,8 @@ class ConstraintMatrix(object):
                     self._column_head_by_constraint[covered_constraint])
         self.__append_column_nodes(last_column_node, node)
         self.__append_row_nodes(last_row_node, node)
+        if node.column_head:
+            node.column_head.size += 1
 
     def __append_row_nodes(self, last_row_node, node):
         last_row_node.right = node
@@ -270,6 +275,21 @@ class Node(object):
     def __eq__(self, other):
         return (self._candidate, self._covered_constraint) == \
                (other._candidate, other._covered_constraint)
+
+class ColumnHeader(Node):
+    def __init__(self, candidate, covered_constraint,
+                 row_head=None, column_head=None):
+        super().__init__(candidate, covered_constraint,
+                         row_head, column_head)
+        self._size = 0
+
+    @property
+    def size(self):
+        return self._size
+
+    @size.setter
+    def size(self, size):
+        self._size = size
 
 
 class ColumnIterator(object):
