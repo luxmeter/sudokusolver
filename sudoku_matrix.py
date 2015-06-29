@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
+import random
+
 
 class ConstraintMatrix(object):
     """Matrix to solve an exact cover problem.
@@ -26,10 +28,13 @@ class ConstraintMatrix(object):
         return self._entry.down is not None
 
     def get_next_candidate(self):
-        constraint = self.__get_next_constraint()
+        constraint = self.get_unsatisfied_constraint_column()
         if constraint:
-            for node in ColumnIterator(constraint.down):
-                yield node.row_head
+            candidates = [node.row_head
+                          for node in ColumnIterator(constraint.down)]
+            random.shuffle(candidates, random.random)
+            return candidates
+        return []
 
     def cover(self, row_head):
         # For each column j such that Ar, j = 1,
