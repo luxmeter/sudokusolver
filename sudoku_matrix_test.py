@@ -40,7 +40,6 @@ class ConstraintMatrixTest(unittest.TestCase):
     def test_cover_and_uncover(self):
         matrix = self.__create_matrix()
         candidate = matrix._row_head_by_candidate['R1C1#1']
-        self.assertEqual(4, matrix.entry.down.size)
 
         matrix.cover(candidate)
 
