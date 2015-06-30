@@ -13,7 +13,6 @@ class ConstraintMatrix(object):
         self._column_head_by_constraint = {}
         self._column_head_by_candidate = {}
         self._row_head_by_candidate = {}
-        self._row_head_by_constraint = {}
         self._covered_constraints = []
 
     def add(self, candidate=None, covered_constraints=[]):
@@ -33,14 +32,9 @@ class ConstraintMatrix(object):
 
     def get_next_constraints_candidates(self):
         constraint = self.__get_unsatisfied_constraint_column()
-        if constraint:
-            candidates = [node.row_head
-                          for node in ColumnIterator(constraint.down)]
-            while candidates:
-                candidate = min(candidates, key=attrgetter('size'))
-                candidates.remove(candidate)
-                yield candidate
-        return []
+        candidates = [node.row_head
+                      for node in ColumnIterator(constraint.down)]
+        return candidates
 
     def cover(self, row_head):
         # For each column j such that Ar, j = 1,
@@ -86,7 +80,6 @@ class ConstraintMatrix(object):
                 if node.right:
                     node.right.left = node.left
                 removed_column_nodes.append(node)
-                self._row_head_by_constraint[node.covered_constraint].size -= 1
 
         return removed_column_nodes
 
@@ -119,7 +112,6 @@ class ConstraintMatrix(object):
                     node.left.right = node
                 if node.right:
                     node.right.left = node
-                self._row_head_by_constraint[node.covered_constraint].size += 1
 
     def __get_next_constraint(self):
         for c in RowIterator(self._entry.right):
@@ -175,10 +167,10 @@ class ConstraintMatrix(object):
                     self._column_head_by_constraint[covered_constraint])
         self.__append_column_nodes(last_column_node, node)
         self.__append_row_nodes(last_row_node, node)
-        self._row_head_by_constraint[node.covered_constraint] = node.row_head
         self._column_head_by_candidate[node.candidate] = node.column_head
-        if node.row_head:
-            node.row_head.size += 1
+
+        if node.column_head:
+            node.column_head.size += 1
 
     def __append_row_nodes(self, last_row_node, node):
         last_row_node.right = node
