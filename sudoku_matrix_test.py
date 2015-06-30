@@ -40,10 +40,10 @@ class ConstraintMatrixTest(unittest.TestCase):
     def test_cover_and_uncover(self):
         matrix = self.__create_matrix()
         candidate = matrix._row_head_by_candidate['R1C1#1']
-
-        self.assertEqual(9, matrix.entry.right.size)
+        self.assertEqual(4, matrix.entry.down.size)
 
         matrix.cover(candidate)
+
         covered_constraints = get_all_satisfied_constraints('R1C1#1')
         count_covered_constraints = len(covered_constraints)
         count_covered_candidates = 29
@@ -53,11 +53,8 @@ class ConstraintMatrixTest(unittest.TestCase):
                          count_constraints)
         self.assertEqual(MAX_CANDIDATES - count_covered_candidates,
                          count_candidates)
-        self.assertEqual(8, matrix._column_head_by_constraint['R1#2'].size)
 
         matrix.uncover()
-
-        self.assertEqual(9, matrix._column_head_by_constraint['R1#2'].size)
 
         count_candidates, count_constraints = self.__calc_size(matrix)
         self.__check_size(count_candidates, count_constraints)

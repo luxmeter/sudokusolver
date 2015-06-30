@@ -9,6 +9,7 @@ from rules import get_all_candidates
 import visualizer
 
 logging.basicConfig(level=logging.INFO)
+log = logging.getLogger(__name__)
 
 
 def main(argv):
@@ -34,11 +35,13 @@ def solve(fixed_candidates):
 def _solve(matrix, result_set=()):
     # there are still candidates left
     if matrix.exists_candidates():
-        for candidate in matrix.get_next_candidate():
+        for candidate in matrix.get_next_constraints_candidates():
+            # log.info('try candidate: %s' % candidate)
             matrix.cover(candidate)
             solution = _solve(matrix, result_set + (candidate.candidate, ))
             if matrix.has_satisfied_all_constraints():
                 return solution
+            # log.info('uncover candidate: %s' % candidate)
             matrix.uncover()
     return result_set
 
