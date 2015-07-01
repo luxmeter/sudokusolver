@@ -2,8 +2,8 @@
 # encoding: utf-8
 import unittest
 
-from .. import importer
-from .. import solver
+from sudoku import importer
+from sudoku import solver
 
 
 class SudokuSolverTest(unittest.TestCase):
