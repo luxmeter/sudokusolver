@@ -2,9 +2,6 @@ from itertools import chain
 from collections import defaultdict
 
 
-# there is only one number in one cell
-
-
 def _get_row_column_constraints():
     for row in range(1, 10):
         for column in range(1, 10):

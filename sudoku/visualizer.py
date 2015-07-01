@@ -1,7 +1,6 @@
-from collections import defaultdict
 import re
 
-import rules
+from collections import defaultdict
 
 
 def visualize(candidates):
@@ -38,7 +37,3 @@ def _map_to_coordinate(candidate):
     column = int(m.group(2))
     number = int(m.group(3))
     return row, column, number
-
-
-if __name__ == '__main__':
-    visualize(rules.get_all_candidates())

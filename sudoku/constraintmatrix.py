@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# encoding: utf-8
 from operator import attrgetter
 
 
@@ -21,7 +19,7 @@ class ConstraintMatrix(object):
 
     def __get_unsatisfied_constraint_column(self):
         constraints = [column_head
-                      for column_head in RowIterator(self._entry.right)]
+                       for column_head in RowIterator(self._entry.right)]
         return min(constraints, key=attrgetter('size'))
 
     def has_satisfied_all_constraints(self):
@@ -48,7 +46,7 @@ class ConstraintMatrix(object):
         # provides all candidates that satisfy the same constraints
         row_heads = self.__get_covered_rows(column_heads)
 
-        removed_row_nodes = self.__cover_rows(row_heads)# remove columns
+        removed_row_nodes = self.__cover_rows(row_heads)  # remove columns
         removed_column_nodes = self.__cover_columns(column_heads)
 
         self._history.append((column_heads, removed_row_nodes, removed_column_nodes))
@@ -123,8 +121,7 @@ class ConstraintMatrix(object):
         seen = []
         for column_head in column_heads:
             for node in ColumnIterator(column_head):
-                if node.row_head and \
-                                node.row_head not in seen:
+                if node.row_head and node.row_head not in seen:
                     seen.append(node.row_head)
         return seen
 
@@ -283,6 +280,7 @@ class Node(object):
     def __eq__(self, other):
         return (self._candidate, self._covered_constraint) == \
                (other._candidate, other._covered_constraint)
+
 
 class Header(Node):
     def __init__(self, candidate, covered_constraint,
