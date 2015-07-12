@@ -8,7 +8,7 @@ from sudokusolver import importer
 from sudokusolver import visualizer
 
 
-def main(argv):
+def main(argv=sys.argv):
     if len(argv) is not 2:
         exit('Aborted. Wrong amount of arguments.')
     file_path = argv[1]
