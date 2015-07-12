@@ -5,9 +5,9 @@ import os
 import sys
 import logging
 
-from sudoku import solver
-from sudoku import importer
-from sudoku import visualizer
+from sudokusolver import solver
+from sudokusolver import importer
+from sudokusolver import visualizer
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)

@@ -2,10 +2,10 @@
 # encoding: utf-8
 import unittest
 
-from sudoku.constraintmatrix import ColumnIterator
-from sudoku.constraintmatrix import ConstraintMatrix
-from sudoku.constraintmatrix import RowIterator
-from sudoku.rules import get_all_candidates, get_all_satisfied_constraints
+from sudokusolver.constraintmatrix import ColumnIterator
+from sudokusolver.constraintmatrix import ConstraintMatrix
+from sudokusolver.constraintmatrix import RowIterator
+from sudokusolver.rules import get_all_candidates, get_all_satisfied_constraints
 
 # logging.basicConfig(level=logging.DEBUG)
 MAX_CANDIDATES = 729
