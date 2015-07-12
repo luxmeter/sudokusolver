@@ -11,7 +11,7 @@ class ConstraintMatrix(object):
         self.__column_head_by_constraint = {}
         self.__column_head_by_candidate = {}
         self.__row_head_by_candidate = {}
-        self._covered_constraints = []
+        self.__covered_constraint = []
 
     def add(self, candidate=None, covered_constraints=[]):
         for constraint in covered_constraints:
@@ -50,7 +50,7 @@ class ConstraintMatrix(object):
         removed_column_nodes = self.__cover_columns(column_heads)
 
         self.__history.append((column_heads, removed_row_nodes, removed_column_nodes))
-        self._covered_constraints = self._covered_constraints + column_heads
+        self.__covered_constraint = self.__covered_constraint + column_heads
         return row_heads, column_heads
 
     def uncover(self):
@@ -59,8 +59,8 @@ class ConstraintMatrix(object):
         self.__uncover_columns(removed_column_nodes)
         self.__uncover_rows(removed_row_nodes)
 
-        self._covered_constraints = \
-            [c for c in self._covered_constraints
+        self.__covered_constraint = \
+            [c for c in self.__covered_constraint
              if c not in column_heads]
 
         return removed_row_nodes, removed_column_nodes
@@ -113,7 +113,7 @@ class ConstraintMatrix(object):
 
     def __get_next_constraint(self):
         for c in RowIterator(self.__entry.right):
-            if c not in self._covered_constraints:
+            if c not in self.__covered_constraint:
                 return c
         return None
 
