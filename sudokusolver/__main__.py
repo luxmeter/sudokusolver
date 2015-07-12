@@ -1,16 +1,11 @@
 #!/usr/bin/env python3
 # encoding: utf-8
-
 import os
 import sys
-import logging
 
 from sudokusolver import solver
 from sudokusolver import importer
 from sudokusolver import visualizer
-
-logging.basicConfig(level=logging.INFO)
-log = logging.getLogger(__name__)
 
 
 def main(argv):
@@ -23,7 +18,6 @@ def main(argv):
     fixed_candidates = importer.imp_candidates(file_path)
     solution = solver.solve(fixed_candidates)
     if solution:
-        print('Found solution! {}'.format(solution))
         visualizer.visualize(fixed_candidates+solution)
     else:
         exit('There is no solution')

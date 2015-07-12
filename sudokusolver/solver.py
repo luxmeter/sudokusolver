@@ -1,11 +1,6 @@
-import logging
-
 from .constraintmatrix import ConstraintMatrix
 from .rules import get_all_satisfied_constraints
 from .rules import get_all_candidates
-
-logging.basicConfig(level=logging.INFO)
-log = logging.getLogger(__name__)
 
 
 def solve(fixed_candidates):
@@ -15,15 +10,12 @@ def solve(fixed_candidates):
 
 
 def _solve(matrix, result_set=()):
-    # there are still candidates left
-    if matrix.exists_candidates():
+    if matrix.candidates_exist():
         for candidate in matrix.get_next_constraints_candidates():
-            # log.info('try candidate: %s' % candidate)
             matrix.cover(candidate)
             solution = _solve(matrix, result_set + (candidate.candidate, ))
             if matrix.has_satisfied_all_constraints():
                 return solution
-            # log.info('uncover candidate: %s' % candidate)
             matrix.uncover()
     return result_set
 
