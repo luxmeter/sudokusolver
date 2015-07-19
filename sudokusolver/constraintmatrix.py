@@ -222,6 +222,30 @@ class Node(object):
         self.row_head = row_head
         self.column_head = column_head
 
+    @staticmethod
+    def connect(a, b, *, how):
+        """Joins the given nodes vertically or horizontally together."""
+        if how.lower() == 'vertically':
+            a.down = b
+            b.top = a
+        if how.lower() == 'horizontally':
+            a.right = b
+            b.left = a
+
+    @staticmethod
+    def disconnect(node, *, how):
+        """Disjoins the given node vertically or horizontally from its neighbours."""
+        if how.lower() == 'vertically':
+            if node.left:
+                node.left.right = node.right
+            if node.right:
+                node.right.left = node.left
+        if how.lower() == 'horizontally':
+            if node.top:
+                node.top.down = node.down
+            if node.down:
+                node.down.top = node.top
+
     def __repr__(self):
         return "Node('{}', '{}')".format(self.candidate,
                                          self.covered_constraint)
