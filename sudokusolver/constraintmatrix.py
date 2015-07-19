@@ -1,10 +1,22 @@
+"""
+Module containing data structures to model an exact cover problem.
+"""
 from operator import attrgetter
 
 
 class ConstraintMatrix(object):
-    """Matrix to solve an exact cover problem.
-    Each node knows his top, left, right and bottom neighbour"""
+    """
+    A two dimensional matrix used to solve an exact cover problem.
+    The constraints are mapped by the columns and the candidates by the rows.
+    Each node in the matrix knows its top, left, bottom and right neighbour.
+    A node exists only in case the candidate of the row fulfills the constraint of the column.
 
+    Special nodes, so called ReferenceNodes, point to the first node of a row or a column
+    and are used to itereate through their nodes.
+    Those ReferenceNodes can be accessed through the MatrixHeadReferenceNode
+    which points on its right to the first ColumnReferenceNode
+    and on its bottom to the first RowRefereneNode of the matrix.
+    """
     def __init__(self):
         self.__history = []
         self.__entry = Node('_', '_')

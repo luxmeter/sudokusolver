@@ -18,7 +18,7 @@ def main(argv=sys.argv):
     fixed_candidates = importer.imp_candidates(file_path)
     solution = solver.solve(fixed_candidates)
     if solution:
-        visualizer.visualize(fixed_candidates+solution)
+        visualizer.visualize(fixed_candidates + solution)
     else:
         exit('There is no solution')
 
