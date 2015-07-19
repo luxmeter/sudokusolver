@@ -2,8 +2,8 @@
 A collection of functions to retrieve the constraints met
 by a candidate in a sudoku puzzle and vice-versa.
 """
-from itertools import chain
 from collections import defaultdict
+from itertools import chain
 
 
 def _get_row_column_constraints():

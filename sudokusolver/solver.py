@@ -1,9 +1,8 @@
 """
 Module used to solve sudoku puzzles.
 """
-from .constraintmatrix import ConstraintMatrix
-from .rules import get_all_satisfied_constraints
-from .rules import get_all_candidates
+from .model.constraintmatrix import ConstraintMatrix
+from .rules import get_all_satisfied_constraints, get_all_candidates
 
 
 def solve(fixed_candidates):

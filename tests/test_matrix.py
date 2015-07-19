@@ -2,9 +2,9 @@
 # encoding: utf-8
 import unittest
 
-from sudokusolver.constraintmatrix import ColumnIterator
-from sudokusolver.constraintmatrix import ConstraintMatrix
-from sudokusolver.constraintmatrix import RowIterator
+from sudokusolver.model.constraintmatrix import ConstraintMatrix
+from sudokusolver.model.node import ColumnIterator
+from sudokusolver.model.node import RowIterator
 from sudokusolver.rules import get_all_candidates, get_all_satisfied_constraints
 
 # logging.basicConfig(level=logging.DEBUG)
@@ -20,13 +20,13 @@ class ConstraintMatrixTest(unittest.TestCase):
         self.m.add('r1', ['c1', 'c2'])
         # iterator will iterate downwards through the rows
         nodes = [(node.candidate, node.covered_constraint)
-                 for node in ColumnIterator(self.m.entry)]
+                 for node in ColumnIterator(self.m.head_ref_node)]
         self.assertEqual(2, len(nodes))
         self.assertCountEqual([('_', '_'), ('r1', '_')],
                               nodes)
 
         nodes = [(node.candidate, node.covered_constraint)
-                 for node in RowIterator(self.m.entry)]
+                 for node in RowIterator(self.m.head_ref_node)]
         self.assertEqual(3, len(nodes))
         self.assertCountEqual([('_', '_'), ('_', 'c1'), ('_', 'c2')],
                               nodes)
@@ -38,7 +38,7 @@ class ConstraintMatrixTest(unittest.TestCase):
 
     def test_cover_and_uncover(self):
         matrix = self.__create_matrix()
-        candidate = matrix.entry.down
+        candidate = matrix.head_ref_node.bottom
 
         matrix.cover(candidate)
 
@@ -72,22 +72,22 @@ class ConstraintMatrixTest(unittest.TestCase):
     def __check_integrity(self):
         # row checks
         nodes = [(node.candidate, node.covered_constraint)
-                 for node in RowIterator(self.m.entry.down)]
+                 for node in RowIterator(self.m.head_ref_node.bottom)]
         self.assertEqual(3, len(nodes))
         self.assertCountEqual([('r1', '_'), ('r1', 'c1'), ('r1', 'c2')],
                               nodes)
         nodes = [(node.candidate, node.covered_constraint)
-                 for node in RowIterator(self.m.entry.down.down)]
+                 for node in RowIterator(self.m.head_ref_node.bottom.bottom)]
         self.assertEqual(2, len(nodes))
         self.assertCountEqual([('r2', '_'), ('r2', 'c2')], nodes)
         # column checks
         nodes = [(node.candidate, node.covered_constraint)
-                 for node in ColumnIterator(self.m.entry.right)]
+                 for node in ColumnIterator(self.m.head_ref_node.right)]
         self.assertEqual(2, len(nodes))
         self.assertCountEqual([('_', 'c1'), ('r1', 'c1')],
                               nodes)
         nodes = [(node.candidate, node.covered_constraint)
-                 for node in ColumnIterator(self.m.entry.right.right)]
+                 for node in ColumnIterator(self.m.head_ref_node.right.right)]
         self.assertEqual(3, len(nodes))
         self.assertCountEqual([('_', 'c2'), ('r1', 'c2'), ('r2', 'c2')],
                               nodes)
@@ -95,12 +95,12 @@ class ConstraintMatrixTest(unittest.TestCase):
         # iterate through column headers
         nodes = [(node.candidate, node.covered_constraint)
                  for node in
-                 RowIterator(self.m.entry.right.right, reversed=True)]
+                 RowIterator(self.m.head_ref_node.right.right, reversed=True)]
         self.assertEqual(3, len(nodes))
         self.assertCountEqual([('_', '_'), ('_', 'c1'), ('_', 'c2')], nodes)
         # iterate through c2 column
         nodes = [(node.candidate, node.covered_constraint)
-                 for node in ColumnIterator(self.m.entry.right.right.down.down,
+                 for node in ColumnIterator(self.m.head_ref_node.right.right.bottom.bottom,
                                             reversed=True)]
         self.assertEqual(3, len(nodes))
         self.assertCountEqual([('_', 'c2'), ('r1', 'c2'), ('r2', 'c2')],
@@ -111,10 +111,10 @@ class ConstraintMatrixTest(unittest.TestCase):
         self.assertEqual(MAX_CANDIDATES, count_candidates)
 
     def __calc_size(self, matrix):
-        count_constraints = sum([1 for n in RowIterator(matrix.entry)
-                                 if n is not matrix.entry])
-        count_candidates = sum([1 for n in ColumnIterator(matrix.entry)
-                                if n is not matrix.entry])
+        count_constraints = sum([1 for n in RowIterator(matrix.head_ref_node)
+                                 if n is not matrix.head_ref_node])
+        count_candidates = sum([1 for n in ColumnIterator(matrix.head_ref_node)
+                                if n is not matrix.head_ref_node])
         return count_candidates, count_constraints
 
 

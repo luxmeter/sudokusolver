@@ -3,9 +3,7 @@
 import os
 import sys
 
-from sudokusolver import solver
-from sudokusolver import importer
-from sudokusolver import visualizer
+from sudokusolver import solver, importer, visualizer
 
 
 def main(argv=sys.argv):
