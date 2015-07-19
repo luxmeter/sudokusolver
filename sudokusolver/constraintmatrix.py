@@ -20,9 +20,9 @@ class ConstraintMatrix(object):
     def __init__(self):
         self.__history = []
         self.__entry = Node('_', '_')
-        self.__column_head_by_constraint = {}
-        self.__column_head_by_candidate = {}
-        self.__row_head_by_candidate = {}
+        # accessible by candidate and constraint
+        self.__col_ref_nodes = {}
+        self.__row_ref_nodes = {}
         self.__covered_constraint = []
 
     def add(self, candidate=None, covered_constraints=[]):
@@ -102,7 +102,7 @@ class ConstraintMatrix(object):
                 if node.down:
                     node.down.top = node.top
                 removed_row_nodes.append(node)
-                self.__column_head_by_candidate[node.candidate].size -= 1
+                self.__col_ref_nodes[node.candidate].size -= 1
 
         return removed_row_nodes
 
@@ -113,7 +113,7 @@ class ConstraintMatrix(object):
                     node.top.down = node
                 if node.down:
                     node.down.top = node
-                self.__column_head_by_candidate[node.candidate].size += 1
+                self.__col_ref_nodes[node.candidate].size += 1
 
     def __uncover_columns(self, removed_column_nodes):
         if removed_column_nodes:
@@ -146,51 +146,37 @@ class ConstraintMatrix(object):
         last_row_node = self.__get_last_row_node(candidate)
 
         if not last_column_node:
-            last_column_node = Header('_', covered_constraint)
-            if not self.__entry.right:
-                self.__entry.right = last_column_node
-                last_column_node.left = self.__entry
+            last_column_node = ColumnReferenceNode('_', covered_constraint)
 
         if not last_row_node:
-            last_row_node = Header(candidate, '_')
-            if not self.__entry.down:
-                self.__entry.down = last_row_node
-                last_row_node.top = self.__entry
+            last_row_node = RowReferenceNode(candidate, '_')
 
         # add node to the column_map if not defined yet
-        if not self.__column_head_by_constraint.get(covered_constraint):
-            self.__column_head_by_constraint[covered_constraint] = last_column_node
+        if not self.__col_ref_nodes.get(covered_constraint):
+            self.__col_ref_nodes[covered_constraint] = last_column_node
             last = self.__get_last_row_node(None, head=self.__entry)
             if last is not last_column_node:
-                self.__append_row_nodes(last, last_column_node)
+                Node.connect(last, last_column_node, how='horizontally')
 
         # add node to the row_map if not defined yet
-        if not self.__row_head_by_candidate.get(candidate):
-            self.__row_head_by_candidate[candidate] = last_row_node
+        if not self.__row_ref_nodes.get(candidate):
+            self.__row_ref_nodes[candidate] = last_row_node
             last = self.__get_last_column_node(None, head=self.__entry)
             if last is not last_row_node:
-                self.__append_column_nodes(last, last_row_node)
+                Node.connect(last, last_row_node, how='vertically')
 
         node = Node(candidate, covered_constraint,
-                    self.__row_head_by_candidate[candidate],
-                    self.__column_head_by_constraint[covered_constraint])
-        self.__append_column_nodes(last_column_node, node)
-        self.__append_row_nodes(last_row_node, node)
-        self.__column_head_by_candidate[node.candidate] = node.column_head
+                    self.__row_ref_nodes[candidate],
+                    self.__col_ref_nodes[covered_constraint])
+        Node.connect(last_column_node, node, how='vertically')
+        Node.connect(last_row_node, node, how='horizontally')
+        self.__col_ref_nodes[node.candidate] = node.column_head
 
         if node.column_head:
             node.column_head.size += 1
 
-    def __append_row_nodes(self, last_row_node, node):
-        last_row_node.right = node
-        node.left = last_row_node
-
-    def __append_column_nodes(self, last_column_node, node):
-        last_column_node.down = node
-        node.top = last_column_node
-
     def __get_last_row_node(self, candidate, head=None):
-        current = self.__row_head_by_candidate.get(candidate) \
+        current = self.__row_ref_nodes.get(candidate) \
             if not head else head
         if current:
             while current.right:
@@ -200,7 +186,7 @@ class ConstraintMatrix(object):
         return None
 
     def __get_last_column_node(self, covered_constraint, head=None):
-        current = self.__column_head_by_constraint.get(covered_constraint) \
+        current = self.__col_ref_nodes.get(covered_constraint) \
             if not head else head
         if current:
             while current.down:
@@ -262,12 +248,25 @@ class Node(object):
                (other.candidate, other.covered_constraint)
 
 
-class Header(Node):
+class RowReferenceNode(Node):
+    def __init__(self, candidate, covered_constraint,
+                 row_head=None, column_head=None):
+        super().__init__(candidate, covered_constraint,
+                         row_head, column_head)
+
+    def __iter__(self):
+        return RowIterator(self.right)
+
+
+class ColumnReferenceNode(Node):
     def __init__(self, candidate, covered_constraint,
                  row_head=None, column_head=None):
         super().__init__(candidate, covered_constraint,
                          row_head, column_head)
         self.size = 0
+
+    def __iter__(self):
+        return ColumnIterator(self.down)
 
 
 class ColumnIterator(object):
@@ -276,16 +275,11 @@ class ColumnIterator(object):
         self._reversed = reversed
 
     def __iter__(self):
-        return self
-
-    def __next__(self):
         next_node = 'top' if self._reversed else 'down'
-        if self._current:
+        while self._current:
             current, self._current = \
                 self._current, vars(self._current)[next_node]
-            return current
-        else:
-            raise StopIteration
+            yield current
 
 
 class RowIterator(object):
@@ -294,13 +288,8 @@ class RowIterator(object):
         self._reversed = reversed
 
     def __iter__(self):
-        return self
-
-    def __next__(self):
         next_node = 'left' if self._reversed else 'right'
-        if self._current:
+        while self._current:
             current, self._current = \
                 self._current, vars(self._current)[next_node]
-            return current
-        else:
-            raise StopIteration
+            yield current
