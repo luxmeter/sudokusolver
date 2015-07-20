@@ -16,7 +16,7 @@ class Node(object):
         self.column_ref_node = column_ref_node
 
     @staticmethod
-    def connect(a, b, how: str):
+    def connect(a: 'Node', b: 'Node', how: str):
         """Joins the given nodes **vertically** or **horizontally** together."""
         if how.lower() == 'vertically':
             if a:
@@ -30,7 +30,7 @@ class Node(object):
                 b.left = a
 
     @staticmethod
-    def disconnect(node, how: str):
+    def disconnect(node: 'Node', how: str):
         """Disjoins the given node **vertically** or **horizontally** from its neighbours."""
         if how.lower() == 'vertically':
             if node.left:
