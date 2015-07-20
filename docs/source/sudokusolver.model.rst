@@ -12,6 +12,14 @@ sudokusolver.model.constraintmatrix module
     :undoc-members:
     :show-inheritance:
 
+sudokusolver.model.iterators module
+-----------------------------------
+
+.. automodule:: sudokusolver.model.iterators
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 sudokusolver.model.node module
 ------------------------------
 

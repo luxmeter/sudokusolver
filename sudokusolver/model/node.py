@@ -1,3 +1,8 @@
+"""Provides Nodes and ReferenceNodes being part of the ConstraintMatrix"""
+
+from .iterators import ColumnIterator, RowIterator
+
+
 class Node(object):
     """
     Simple data structure representing a node within a ConstraintMatrix.
@@ -125,31 +130,3 @@ class MatrixHeadReferenceNode(Node):
     def get_row_ref_node_iterator(self):
         """Returns iterator iterating through the RowReferenceNodes"""
         return ColumnIterator(self.bottom)
-
-
-class ColumnIterator(object):
-    """Iterates through a sequence of vertically connected nodes."""
-    def __init__(self, start, reversed=False):
-        self._current = start
-        self._reversed = reversed
-
-    def __iter__(self):
-        next_node = 'top' if self._reversed else 'bottom'
-        while self._current:
-            current, self._current = \
-                self._current, vars(self._current)[next_node]
-            yield current
-
-
-class RowIterator(object):
-    """Iterates through a sequence of horizontally connected nodes."""
-    def __init__(self, start, reversed=False):
-        self._current = start
-        self._reversed = reversed
-
-    def __iter__(self):
-        next_node = 'left' if self._reversed else 'right'
-        while self._current:
-            current, self._current = \
-                self._current, vars(self._current)[next_node]
-            yield current

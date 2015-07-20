@@ -3,8 +3,8 @@
 import unittest
 
 from sudokusolver.model.constraintmatrix import ConstraintMatrix
-from sudokusolver.model.node import ColumnIterator
-from sudokusolver.model.node import RowIterator
+from sudokusolver.model.iterators import ColumnIterator
+from sudokusolver.model.iterators import RowIterator
 from sudokusolver.rules import get_all_candidates, get_all_satisfied_constraints
 
 # logging.basicConfig(level=logging.DEBUG)
