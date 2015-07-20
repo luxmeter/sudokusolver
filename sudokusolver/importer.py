@@ -1,17 +1,19 @@
 """
 Provides functions to parse sudoku puzzle from a
-text file written in following format:
-_,_,7,  1,_,4,  3,9,_
-9,_,5,  3,2,7,  1,4,8
-3,4,1,  6,8,9,  _,5,2
+text file written in following format::
 
-5,9,3,  _,6,8,  2,_,1
-_,7,2,  _,1,3,  _,_,9
-6,1,_,  9,7,2,  _,3,5
+    _,_,7,  1,_,4,  3,9,_
+    9,_,5,  3,2,7,  1,4,8
+    3,4,1,  6,8,9,  _,5,2
 
-_,8,6,  2,3,_,  9,1,4
-1,5,4,  _,9,6,  8,2,3
-_,3,9,  8,4,1,  5,_,_
+    5,9,3,  _,6,8,  2,_,1
+    _,7,2,  _,1,3,  _,_,9
+    6,1,_,  9,7,2,  _,3,5
+
+    _,8,6,  2,3,_,  9,1,4
+    1,5,4,  _,9,6,  8,2,3
+    _,3,9,  8,4,1,  5,_,_
+
 """
 import csv
 
@@ -30,11 +32,11 @@ def _get_rows(path):
         return rows
 
 
-def imp_candidates(path):
-    """ Parses a sudoku puzzle and returns the containing numbers
-    as strings in the form of R{rowNumber}C{columnNumber}#{number}.
-    For example 'R1C1#1' says that in the cell of the first
-    row and column the number one was written into.
+def imp_candidates(path: str) -> tuple:
+    """Parses a sudoku puzzle and returns the containing numbers
+    as strings in the form of ``R{rowNumber}C{columnNumber}#{number}``.
+    For example ``R1C1#`` says that in the cell of the first
+    row and first column the number one was written into.
 
     Args:
         path: path to the file containing the sudoku puzzle

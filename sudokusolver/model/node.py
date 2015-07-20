@@ -16,8 +16,8 @@ class Node(object):
         self.column_ref_node = column_ref_node
 
     @staticmethod
-    def connect(a, b, how):
-        """Joins the given nodes vertically or horizontally together."""
+    def connect(a, b, how: str):
+        """Joins the given nodes **vertically** or **horizontally** together."""
         if how.lower() == 'vertically':
             if a:
                 a.bottom = b
@@ -30,8 +30,8 @@ class Node(object):
                 b.left = a
 
     @staticmethod
-    def disconnect(node, how):
-        """Disjoins the given node vertically or horizontally from its neighbours."""
+    def disconnect(node, how: str):
+        """Disjoins the given node **vertically** or **horizontally** from its neighbours."""
         if how.lower() == 'vertically':
             if node.left:
                 node.left.right = node.right
@@ -92,7 +92,7 @@ class ColumnReferenceNode(Node):
     def __iter__(self):
         return iter(ColumnIterator(self.bottom))
 
-    def get_last_node(self):
+    def get_last_node(self) -> Node:
         """Returns the last node of the column represented by this ColumnReferenceNode."""
         if not self.bottom:
             return None
@@ -102,18 +102,18 @@ class ColumnReferenceNode(Node):
 
 class MatrixHeadReferenceNode(Node):
     """
-    Special kind of node that refers ColumnReferenceNodes and RowReferenceNodes.
+    Special kind of node that refers to ColumnReferenceNodes and RowReferenceNodes.
     Used by the ConstraintMatrix to itereate through its columns and rows.
     """
     def __init__(self):
         super().__init__('_', '_', None, None)
 
-    def get_last_column_ref_node(self):
+    def get_last_column_ref_node(self) -> Node:
         """Returns the last ColumnReferenceNode in the matrix otherwise itself"""
         ref_nodes = [ref_node for ref_node in RowIterator(self)]
         return ref_nodes.pop()
 
-    def get_last_row_ref_node(self):
+    def get_last_row_ref_node(self) -> Node:
         """Returns the last RowReferenceNode in the matrix otherwise itself"""
         ref_nodes = [ref_node for ref_node in ColumnIterator(self)]
         return ref_nodes.pop()

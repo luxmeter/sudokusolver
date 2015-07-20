@@ -23,9 +23,13 @@ class ConstraintMatrix(object):
 
     Some methods expect candidates and constraint names.
     Those are simple strings obeying following format pattern:
-    * candidate:  R{rowNumber}C{columnNumber}#{number}
-    * constraint: R{rowNumber}#{number}, C{columnNumber}#{number},
-                  B{blockNumber}#{number}, R{rowNumber}C{columnNumber}
+
+    * candidate: ``R{rowNumber}C{columnNumber}#{number}``
+    * constraints: 
+        * ``R{rowNumber}#{number}``,
+        * ``C{columnNumber}#{number}``,
+        * ``B{blockNumber}#{number}``,
+        * ``R{rowNumber}C{columnNumber}``
     """
     def __init__(self):
         self.__history = []
@@ -41,8 +45,8 @@ class ConstraintMatrix(object):
         the provided candidate and constraints.
 
         Args:
-            candidate: candidate name to be attached to the Node
-            covered_constraints: constraint names to be attached to the Node
+            candidate (str): candidate name to be attached to the Node
+            covered_constraints (list): constraint names to be attached to the Node
         """
         for constraint in covered_constraints:
             self.__append(candidate, constraint)
@@ -52,18 +56,21 @@ class ConstraintMatrix(object):
                        for column_ref_node in self.__entry.get_column_ref_node_iterator()]
         return min(constraints, key=attrgetter('size'))
 
-    def has_satisfied_all_constraints(self):
+    def has_satisfied_all_constraints(self) -> bool:
         """Returns True of all contraints has been satisfied, otherwise False"""
         return self.__entry.right is None
 
-    def candidates_exist(self):
+    def candidates_exist(self) -> bool:
         """Returs True if any candidate is left, otherwise False"""
         return self.__entry.bottom is not None
 
-    def get_next_constraints_candidates(self):
+    def get_next_constraints_candidates(self) -> list:
         """
         Returns a sequence of RowReferenceNodes(candidates) fulfilling
         the next automatically chosen ColumnReferenceNode(constraint)
+
+        Returns:
+            list of RowReferenceNodes
         """
         constraint = self.__get_unsatisfied_constraint_column()
         candidates = [node.row_ref_node for node in constraint]
@@ -73,13 +80,14 @@ class ConstraintMatrix(object):
         """Covers the candidate itself and all satisfiying constraints
         as well as the other candidates that would satisfy those.
 
-        Removes complete rows and columns according the Algorithm-X:
-        For each column j such that Ar, j = 1
-          for each row i such that Ai, j = 1
-              delete row i from matrix A
-          delete column j from matrix A
+        Removes complete rows and columns according the Algorithm-X::
 
-        Use uncover to undo this operation.
+            For each column j such that Ar, j = 1
+              for each row i such that Ai, j = 1
+                  delete row i from matrix A
+              delete column j from matrix A
+
+        Use uncover to undo the changes made by this operation.
         """
         # provides all constraints the provided candidate is satisfying
         column_ref_nodes = self.__get_covered_columns(row_ref_node)
@@ -109,8 +117,9 @@ class ConstraintMatrix(object):
         return removed_row_nodes, removed_column_nodes
 
     @property
-    def head_ref_node(self):
-        """Returns the MatrixHeadReferenceNode"""
+    def head_ref_node(self) -> MatrixHeadReferenceNode:
+        """Returns the MatrixHeadReferenceNode.
+        Can be used to iterate through the RowReferenceNodes and ColumnReferenceNodes"""
         return self.__entry
 
     @staticmethod

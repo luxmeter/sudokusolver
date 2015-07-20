@@ -61,11 +61,14 @@ def _get_satisfying_values(predicate, constraint=None):
     return satisfied_constraints
 
 
-def get_all_candidates():
+def get_all_candidates() -> str:
     """
     Returns all possible numbers for each cell in a sudoku puzzle
-    as strings in the format of R{rowNumber}C{columnNumber}#{number}
+    as strings in the format of ``R{rowNumber}C{columnNumber}#{number}``
     - also referred as candidate.
+
+    Returns:
+        list of strings of all possible candidates
     """
     result = []
     for row in range(1, 10):
@@ -75,16 +78,17 @@ def get_all_candidates():
     return result
 
 
-def get_all_satisfied_constraints(*candidates):
+def get_all_satisfied_constraints(*candidates: str) -> list:
     """
     Returns all satisfied constraints by a candidate as strings in following format:
-    * R{number}#{number} - describes one of the row constraints, e.g. R1#1.
-    * C{number}#{number} - describes one of the column constraints, e.g. C1#1.
-    * B{number}#{number} - describes one of the block constraints, e.g. B1#1.
-    * R{number}C{number} - describes one of the row-column constraints, e.g. R1C1.
+
+    * ``R{number}#{number}`` - describes one of the row constraints, e.g. ``R1#1``.
+    * ``C{number}#{number}`` - describes one of the column constraints, e.g. ``C1#1``.
+    * ``B{number}#{number}`` - describes one of the block constraints, e.g. ``B1#1``.
+    * ``R{number}C{number}`` - describes one of the row-column constraints, e.g. ``R1C1``.
 
     Args:
-        candidates: candidates as strings in form of R{rowNumber}C{columnNumber}#{number}
+        candidates: candidates as strings in form of ``R{rowNumber}C{columnNumber}#{number}``
 
     Returns:
         list of strings of fulfilled constraints
@@ -98,13 +102,17 @@ def get_all_satisfied_constraints(*candidates):
     return res
 
 
-def get_all_constraints():
+def get_all_constraints() -> list:
     """
     Returns all constraints of a sudoku puzzle as strings in the following format:
-    * R{number}#{number} - describes one of the row constraints, e.g. R1#1.
-    * C{number}#{number} - describes one of the column constraints, e.g. C1#1.
-    * B{number}#{number} - describes one of the block constraints, e.g. B1#1.
-    * R{number}C{number} - describes one of the row-column constraints, e.g. R1C1.
+
+    * ``R{number}#{number}`` - describes one of the row constraints, e.g. ``R1#1``.
+    * ``C{number}#{number}`` - describes one of the column constraints, e.g. ``C1#1``.
+    * ``B{number}#{number}`` - describes one of the block constraints, e.g. ``B1#1``.
+    * ``R{number}C{number}`` - describes one of the row-column constraints, e.g. ``R1C1``.
+
+    Returns
+        list of strings of all constraints
     """
     return chain(_get_row_column_constraints(), _get_row_number_constraints(),
                  _get_column_number_constraints(),
