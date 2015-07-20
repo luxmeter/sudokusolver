@@ -1,6 +1,3 @@
-"""
-Module containing data structures to model an exact cover problem.
-"""
 from collections import defaultdict
 from operator import attrgetter
 from .node import Node
@@ -16,13 +13,19 @@ class ConstraintMatrix(object):
     A two dimensional matrix used to solve an exact cover problem.
     The constraints are mapped by the columns and the candidates by the rows.
     Each node in the matrix knows its top, left, bottom and right neighbour.
-    A node exists only in case the candidate of the row_ref_node fulfills the constraint of the column.
+    A node exists only in case the candidate of the row fulfills the constraint of the column.
 
-    Special nodes, so called ReferenceNodes, point to the first node of a row_ref_node or a column
+    Special nodes, so called ReferenceNodes, point to the first node of a row or a column
     and are used to itereate through their nodes.
     Those ReferenceNodes can be accessed through the MatrixHeadReferenceNode
     which points on its right to the first ColumnReferenceNode
     and on its bottom to the first RowRefereneNode of the matrix.
+
+    Some methods expect candidates and constraint names.
+    Those are simple strings obeying following format pattern:
+    * candidate:  R{rowNumber}C{columnNumber}#{number}
+    * constraint: R{rowNumber}#{number}, C{columnNumber}#{number},
+                  B{blockNumber}#{number}, R{rowNumber}C{columnNumber}
     """
     def __init__(self):
         self.__history = []
@@ -33,31 +36,51 @@ class ConstraintMatrix(object):
         self.__covered_constraint = []
 
     def add(self, candidate=None, covered_constraints=[]):
+        """
+        creates and adds a new node to the matrix labeled with
+        the provided candidate and constraints.
+
+        Args:
+            candidate: candidate name to be attached to the Node
+            covered_constraints: constraint names to be attached to the Node
+        """
         for constraint in covered_constraints:
             self.__append(candidate, constraint)
 
     def __get_unsatisfied_constraint_column(self):
         constraints = [column_ref_node
-                       for column_ref_node in RowIterator(self.__entry.right)]
+                       for column_ref_node in self.__entry.get_column_ref_node_iterator()]
         return min(constraints, key=attrgetter('size'))
 
     def has_satisfied_all_constraints(self):
+        """Returns True of all contraints has been satisfied, otherwise False"""
         return self.__entry.right is None
 
     def candidates_exist(self):
+        """Returs True if any candidate is left, otherwise False"""
         return self.__entry.bottom is not None
 
     def get_next_constraints_candidates(self):
+        """
+        Returns a sequence of RowReferenceNodes(candidates) fulfilling
+        the next automatically chosen ColumnReferenceNode(constraint)
+        """
         constraint = self.__get_unsatisfied_constraint_column()
         candidates = [node.row_ref_node for node in constraint]
         return candidates
 
     def cover(self, row_ref_node):
-        # For each column j such that Ar, j = 1,
-        #   for each row_ref_node i such that Ai, j = 1,
-        #       delete row_ref_node i from matrix A;
-        #   delete column j from matrix A.
+        """Covers the candidate itself and all satisfiying constraints
+        as well as the other candidates that would satisfy those.
 
+        Removes complete rows and columns according the Algorithm-X:
+        For each column j such that Ar, j = 1
+          for each row i such that Ai, j = 1
+              delete row i from matrix A
+          delete column j from matrix A
+
+        Use uncover to undo this operation.
+        """
         # provides all constraints the provided candidate is satisfying
         column_ref_nodes = self.__get_covered_columns(row_ref_node)
 
@@ -73,6 +96,7 @@ class ConstraintMatrix(object):
         return row_ref_nodes, column_ref_nodes
 
     def uncover(self):
+        """Reverts all changes done by cover operation"""
         column_ref_nodes, removed_row_nodes, removed_column_nodes = self.__history.pop()
 
         self.__uncover_columns(removed_column_nodes)
@@ -86,6 +110,7 @@ class ConstraintMatrix(object):
 
     @property
     def head_ref_node(self):
+        """Returns the MatrixHeadReferenceNode"""
         return self.__entry
 
     @staticmethod
@@ -123,7 +148,7 @@ class ConstraintMatrix(object):
                 Node.connect(node, node.right, how='horizontally')
 
     def __get_next_constraint(self):
-        for c in RowIterator(self.__entry.right):
+        for c in self.__entry.get_column_ref_node_iterator():
             if c not in self.__covered_constraint:
                 return c
         return None

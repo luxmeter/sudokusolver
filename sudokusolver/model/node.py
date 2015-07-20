@@ -118,6 +118,14 @@ class MatrixHeadReferenceNode(Node):
         ref_nodes = [ref_node for ref_node in ColumnIterator(self)]
         return ref_nodes.pop()
 
+    def get_column_ref_node_iterator(self):
+        """Returns iterator iterating through the ColumnRerefernceNodes"""
+        return RowIterator(self.right)
+
+    def get_row_ref_node_iterator(self):
+        """Returns iterator iterating through the RowReferenceNodes"""
+        return ColumnIterator(self.bottom)
+
 
 class ColumnIterator(object):
     """Iterates through a sequence of vertically connected nodes."""
