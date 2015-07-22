@@ -1,19 +1,12 @@
-"""Provides mechanism to visualize sudoku puzzles"""
+"""Provides mechanism to visualize sudoku puzzles."""
 import re
 
 from collections import defaultdict
 
 
-def visualize(candidates):
-    """Print the sudoku puzzle on the std. output.
-    The candidates are a list of strings each representing
-    a number in a cell. Therefore they obey a particular format
-    pattern::
-    
-        R{rowNumber}C{columnNumber}#{number}
-
-    For example ``R1C1#1`` means that the cell in the first row
-    and first column containts the number one.
+def visualize(candidates: str):
+    """Prints the sudoku puzzle as given as a list of candidates
+    (e.g. ``R1C1#1``) on the standard output.
 
     Args:
         candidates: sequence of strings representing a number in a cell

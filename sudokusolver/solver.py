@@ -1,33 +1,34 @@
 """
 Module used to solve sudoku puzzles.
 """
+from sudokusolver import rules
 from .model.constraintmatrix import ConstraintMatrix
-from .rules import get_all_satisfied_constraints, get_all_candidates
 
 
-def solve(fixed_candidates: list) -> list:
+def solve(fixed_candidates, rule_description=None) -> list:
     """
-    Solves a sudoku puzzle by applying the exact cover problem on it.
-    The puzzle is described here as sequence of *fixed candidates*
-    which are nothing more than strings representing the already filled in numbers.
-    Those strings obey are particular format pattern to identify the cells
-    in which the numbers were filled in::
+    Solves by default a sudoku puzzle by applying the exact cover problem to it
+    and using the Algorithm-X by Donald Knuth.
+    The puzzle is described here as sequence of strings describing the *fixed candidates*::
     
         R{rowNumber}C{columnNumber}#{number}
 
-
-    For example ``R1C1#1`` means that in the cell of the first row and first column
-    the number one was written into.
-
     The return value is also list of candidates which solve the sudoku.
+    
+    Note:
+
+        The second argument can be used to solve other exact cover problems than sudoku.
+        See documentation for further information.
 
     Args:
-        fixed_candidates: cells with their numbers
+        fixed_candidates: list of strings describing the filled in cells with their numbers
+        rule_description: lookup for candidates and constraints of sudoku
 
     Returns:
-        list of candidates solving the sudoku puzzle
+        list of strings describing the candidates solving the sudoku puzzle
     """
-    matrix = _create_matrix(fixed_candidates)
+    rule_description = rules if not rule_description else rule_description
+    matrix = _create_matrix(fixed_candidates, rule_description)
     solution = _solve(matrix)
     return solution if matrix.has_satisfied_all_constraints() else []
 
@@ -43,11 +44,11 @@ def _solve(matrix, result_set=()):
     return result_set
 
 
-def _create_matrix(fixed_candidates):
+def _create_matrix(fixed_candidates, rule_description):
     matrix = ConstraintMatrix()
-    fixed_constraints = get_all_satisfied_constraints(*fixed_candidates)
-    for candidate in get_all_candidates():
-        satisfied_constraints = get_all_satisfied_constraints(candidate)
+    fixed_constraints = rule_description.get_all_satisfied_constraints(*fixed_candidates)
+    for candidate in rule_description.get_all_candidates():
+        satisfied_constraints = rule_description.get_all_satisfied_constraints(candidate)
         if candidate not in fixed_candidates \
                 and not (set(fixed_constraints) & set(satisfied_constraints)):
             matrix.add(candidate, satisfied_constraints)

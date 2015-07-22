@@ -20,16 +20,6 @@ class ConstraintMatrix(object):
     Those ReferenceNodes can be accessed through the MatrixHeadReferenceNode
     which points on its right to the first ColumnReferenceNode
     and on its bottom to the first RowRefereneNode of the matrix.
-
-    Some methods expect candidates and constraint names.
-    Those are simple strings obeying following format pattern:
-
-    * candidate: ``R{rowNumber}C{columnNumber}#{number}``
-    * constraints: 
-        * ``R{rowNumber}#{number}``,
-        * ``C{columnNumber}#{number}``,
-        * ``B{blockNumber}#{number}``,
-        * ``R{rowNumber}C{columnNumber}``
     """
     def __init__(self):
         self.__history = []

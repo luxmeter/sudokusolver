@@ -1,6 +1,15 @@
 """
 A collection of functions to retrieve the constraints met
 by a candidate in a sudoku puzzle and vice-versa.
+
+This module is used by the ``solver`` module to construct
+the constraint matrix representing the sudoku puzzle as an exact cover problem.
+If you want to solve another exact cover problem by the solver,
+you have to pass it a module providing following methods:
+
+    * get_all_candidates
+    * get_all_constraints
+    * get_all_satisfied_constraints
 """
 from collections import defaultdict
 from itertools import chain

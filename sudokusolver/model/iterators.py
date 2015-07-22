@@ -1,5 +1,5 @@
 """Provides iterators to iterate through
-the nodes of the rows and columns of the ConstraintMatrix"""
+the nodes of the rows and columns of the ConstraintMatrix."""
 
 
 class ColumnIterator(object):

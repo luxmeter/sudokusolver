@@ -1,4 +1,4 @@
-"""Provides Nodes and ReferenceNodes being part of the ConstraintMatrix"""
+"""Provides Nodes and ReferenceNodes being part of the ConstraintMatrix."""
 
 from .iterators import ColumnIterator, RowIterator
 
