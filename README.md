@@ -18,8 +18,11 @@ python3 -m pip install --user git+https://github.com/luxmeter/sudokusolver
 
 You can read how to install pip [here](https://pip.pypa.io/en/stable/installing.html#install-pip).
 
-Solve sudokus using the CLI
+## Solve sudokus using the CLI
+
+```python
 python3 -m sudokusolver sudoku_puzzle.csv
+```
 Whereas the csv file follows a particular format pattern:
 
 ```
@@ -36,7 +39,8 @@ _,_,_,  _,_,1,  _,_,_
 _,_,2,  _,3,_,  4,_,_
 ```
 
-Solve sudokus using the library
+##Solve sudokus using the library
+
 You can use the sudoksusolver also in your application by importing the sudokusolver package. It contains several modules dealing with the importing, visualization and solving of sudokus. See the API reference for a detailed description.
 
 To solve a sudoku, you only need the solver module
