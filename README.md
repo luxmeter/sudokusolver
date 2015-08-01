@@ -61,11 +61,14 @@ from sudokusolver import importer
 fixed_candidates = importer.imp_candidates('sudoku_puzzle.csv')
 ```
 
-Build the documentation
+Documentation
 -----------------------
+
+* See online http://sudokusolver.readthedocs.org/en/latest/
+* Or build by yourself:
 
 ```python
     python3 setup.py build_sphinx -b html
 ```
 
-In order to build the documentation, you have to install [Sphinx](http://sphinx-doc.org/) first.
+Note that you need  to install [Sphinx](http://sphinx-doc.org/) first, before you can build the documentation.
