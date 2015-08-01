@@ -38,46 +38,46 @@ For constraints:
     R{rowNumber}C{columnNumber}         # e.g. R1C1
 
 
-The “importer” module
+sudokusolver.importer
 ---------------------
 
 .. automodule:: sudokusolver.importer
     :members:
 
 
-The “visualizer” module
+sudokusolver.visualizer
 -----------------------
 
 .. automodule:: sudokusolver.visualizer
     :members:
 
 
-The “solver” module
+sudokusolver.solver
 -------------------
 
 .. automodule:: sudokusolver.solver
     :members:
 
 
-The “model” module
+sudokusolver.model
 -------------------
 
 .. automodule:: sudokusolver.model
     :members:
 
-The “model.node” module
+node
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: sudokusolver.model.node
    :members: Node, RowReferenceNode, ColumnReferenceNode, MatrixHeadReferenceNode
 
-The “model.iterators” module
+iterators
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: sudokusolver.model.iterators
    :members:
 
-The “model.constraintmatrix” module
+constraintmatrix
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: sudokusolver.model.constraintmatrix
